@@ -4,4 +4,4 @@
 
 访问链接为：https://lvxu.site/BMW_SLDW/
 
-字体大小调整的功能引用了
+字体大小调整的功能引用了https://github.com/MathGod/web-reading-settings-plugin
