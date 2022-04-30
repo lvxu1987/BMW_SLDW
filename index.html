@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head> 
+	<meta charset="utf-8"> 
+	<title>宝马汽车后轮四轮定位中间值计算工具网页版</title> 
+	<meta name="description" content="一个用于调整宝马品牌汽车后桥四轮定位时，替代作图法的简便工具">
+	<meta name="author" content="吕旭：me@lvxu.site">
+  <style>
+    body{margin: 0 ; height: 100%}
+    .kongjian{
+             width:5%;
+             height:40px;
+             border: 1.5px solid;
+             border-radius: 3px;
+             margin-right: 5px;
+             float:right;
+             background-color:transparent;
+             color:#9E9E9E;
+                  }
+	select,input{font-size:1em;}
+  </style>
+</head>
+<body>
+
+<!--在body标签开始加入网站标题和控件按钮-->
+<button class="kongjian" onclick="return ExecuteFun(this)" >全屏</button>
+<button class="kongjian" id="pingkuan"  onclick="pingkuan();" >屏宽</button>
+<button class="kongjian" onclick="bg();">背景</button>
+<button class="kongjian" id="ziti" onclick="ziti();" >字体</button>
+<button class="kongjian" onclick="jiacu()"><b>B</b></button>
+<button class="kongjian" onclick="zitibianxiao()">A-</button>
+<button class="kongjian" onclick="zitibianda()">A+</button>
+<hr style="margin: 22px;">
+
+<!--加id="content"。控制字体大小，粗细，宋楷黑体和屏幕宽度-->
+<div id="content";style="margin: 0 auto;";text-align:center;>
+	<H1>宝马汽车后轮四轮定位</br>中间值计算工具网页版</H1>
+	
+	<!--，
+	车型选择框
+	
+	G12：7系；G38：5系；G31：5系旅行车
+	G05：X5；G06：X6；G07：X7
+	F02：老款7系；F18：老款5系
+	F11：5系旅行车；F07：5系GT
+	G32：6系
+	G14：8系敞篷；G15：8系轿跑
+	G16：8系双门轿跑
+	)
+		--> 
+	<div style="border: 2px dashed #ccc;text-align:center;">
+		<H3>选择车型</H3>
+		<select name="选择车型" autofocus>
+			<option value="G12、G38">G12、G38、G31</option>
+			<option value="G05、G06、G07">G05、G06、G07</option>
+			<option value="F02、F18">F02、F18</option>
+			<option value="F11、F07">F11、F07</option>
+			<option value="G32">G32</option>
+			<option value="G14、G15">G14、G15</option>
+			<option value="G16">G16</option>
+		</select>
+		<p id="Kc值"></p>
+		<p id="Kd值"></p>
+		<H3>选择四轮定位仪设备</H3>
+		<form onchange="判断设备型号()">
+			<input type="radio" name="四轮定位仪设备" id="四轮定位仪设备" value="亨特">亨特
+			<input type="radio" name="四轮定位仪设备" id="四轮定位仪设备" value="百思巴特">百斯巴特
+		</form>
+		<p>（务必先选择车型和设备）</p>
+	</div>
+	
+	<!--
+	标准值输入框
+	和亨特相关的计算项目会根据上面的设备选项自动出现或消失
+	--> 
+    <div style="border: 2px dashed #ccc;text-align:center;">
+		<H3>输入标准值</H3>
+
+		<div id="外倾标准值上下限"  class="亨特定位仪显示">
+		<label for="外倾标准值上限">外倾标准值上限：-</label>  
+        <input type="number" id="外倾标准值上限度" name="外倾标准值上限度" value="1" min="0" max="3" fontsize="inherit">°  
+        <input type="number" id="外倾标准值上限分" name="外倾标准值上限分" min="0" max="59" value="30" /> '</br>
+		<label for="外倾标准值下限">外倾标准值下限：-</label>  
+        <input type="number" id="外倾标准值下限度" name="外倾标准值下限度" value="1" min="0" max="3" >°  
+        <input type="number" id="外倾标准值下限分" name="外倾标准值下限分" min="0" max="59" value="30" /> '</br>
+	   </div>
+
+	   <label for="外倾标准值">外倾标准值：-</label>  
+        <input type="number" id="外倾标准值度" name="外倾标准值度" value="1" min="0" max="3" class="亨特定位仪锁死" >°  
+        <input type="number" id="外倾标准值分" name="外倾标准值分" min="0" max="59" value="30" class="亨特定位仪锁死" /> '
+        <p id="外倾标准值折合分"></p>	
+
+		<div id="前束标准值分上下限"   class="亨特定位仪显示">
+		<label for="前束标准值分上限">前束标准值上限(分)：</label>  
+        <input type="number" id="前束标准值分上限" name="前束标准值分上限" value="8" min="-100" max="100" />  ′<br>
+		<label for="前束标准值分下限">前束标准值下限(分)：</label>  
+        <input type="number" id="前束标准值分下限" name="前束标准值分下限" value="8" min="-100" max="100" />  ′
+		</div>
+        <label for="前束标准值分">前束标准值分：</label>  
+        <input type="number" id="前束标准值分" name="前束标准值分" value="8" min="-100" max="100" class="亨特定位仪锁死" />  ′
+        <br/> 
+		（注意：如前束为负值需要输入“-”）
+	</div>
+
+	<!--实际值输入框--> 
+    <div style="border: 2px dashed #ccc;text-align:center;">
+		<H3>输入实际值</H3>
+	    <label for="外倾实际值">外倾实际值：-</label>  
+        <input type="number" id="外倾实际值度" name="外倾实际值度" value="1" min="0" max="3"/>° 
+        <input type="number" id="外倾实际值分" name="外倾实际值分" min="0" max="59" value="12" /> ′
+        <p id="外倾实际值折合分"></p>	
+
+        <label for="前束实际值分">前束实际值分：</label>  
+        <input type="number" id="前束实际值分" name="前束实际值分" value="-10" min="-100" max="100" /> ′  
+        <br/> 
+		（注意：如前束为负值需要输入“-”）
+	</div>	
+	
+	<!--中间值计算结果--> 
+    <div style="border: 2px dashed #ccc;text-align:center;">
+		<H3>中间值计算结果</H3>
+        <p id="中间值1外倾折合分"></p>
+		<p id="中间值1外倾"></p>
+		<p id="中间值1前束"></p>
+		<p id="中间值2外倾折合分"></p>
+		<p id="中间值2外倾"></p>
+		<p id="中间值2前束"></p>
+		<p id="中间值1距实际值距离"></p>
+		<p id="中间值2距实际值距离"></p>
+		<p id="中间值外倾"></p>
+		<p id="中间值前束"></p>
+		<p id="先调整臂说明"></p>
+	</div>	
+	<!--按钮--> 	
+	<input type="button" id="计算中间值" onclick="计算中间值()" value="计算中间值">
+	<input type="button" id="清除数据" onclick="清除数据()" value="清除数据">
+	
+	<!--说明--> 
+    <div>
+		<H3>操作提示</H3>
+        1.所有上部横摆臂有调整螺丝的车型需要画图调整后桥；</br>
+		2.先在顶端选择<strong>车型</strong>和<strong>四轮定位仪设备</strong>；</br>
+		3.填写标准值和实际值（注意前束正负号）；</br>
+		4.系统自动计算中间值和对应的调整臂；</br>
+		5.调整中间值对应臂的调整螺栓，只看前束，将前束值从实际值调整为中间值（外倾值也自动调整到中间值）；</br>
+		6.调整另一个臂的调整螺栓，只看前束，将前束值从中间值调整为标准值（外倾值也自动调整到标准值）；</br>
+		7.如外倾没有自动调整到正确，检查参数输入是否正确，底盘杆件有无变形。</br>
+		</br>
+		有任何问题，可以<a href="mailto:xu.lv@best.bmw.com.cn" target="_top">发送邮件</a>给我
+	</div>		
+</div>
+
+	<script>
+	function 计算中间值() {
+		// 计算前先调用函数清除之前的输出结果
+			清除输出结果();
+		
+		// 计算亨特标准值
+			var 四轮定位仪设备 =  document.getElementsByName("四轮定位仪设备");
+			if (四轮定位仪设备[0].checked == true){  //如果第一个选项被选中（即设备是亨特的）
+				
+				// 外倾标准值折合分计算
+					var 外倾标准值上限度 = Number(document.getElementById("外倾标准值上限度").value);
+					var 外倾标准值上限分 = Number(document.getElementById("外倾标准值上限分").value);
+					var 外倾标准值上限折合分 = -(外倾标准值上限度*60+外倾标准值上限分);
+			
+					var 外倾标准值下限度 = Number(document.getElementById("外倾标准值下限度").value);
+					var 外倾标准值下限分 = Number(document.getElementById("外倾标准值下限分").value);
+					var 外倾标准值下限折合分 = -(外倾标准值下限度*60+外倾标准值下限分)
+		
+					var 亨特外倾标准值折合分 = (外倾标准值上限折合分+外倾标准值下限折合分)/2;
+					亨特外倾标准值折合分 = Math.round(亨特外倾标准值折合分); //小数取整
+					//alert(亨特外倾标准值折合分); //检测数值用。
+				// 将算出的外倾值输出到外倾标准值的表格里
+					document.getElementById("外倾标准值度").value = -Math.ceil(亨特外倾标准值折合分/60);//外倾折合分÷60，得数向上取整。  后面显示中间值外倾时，正负号是在公式里带出来的，这里的度数就是负值。这里的负号是写在外面的，所以需要再另写一个负号，负负得正，产生一个正数填在外倾标准值的输入框里。
+					document.getElementById("外倾标准值分").value = Math.abs(亨特外倾标准值折合分%60);//外倾折合分除60取余数再取绝对值。
+
+				// 计算前束标准值
+					var 前束标准值分上限 = Number(document.getElementById("前束标准值分上限").value);
+					var 前束标准值分下限 = Number(document.getElementById("前束标准值分下限").value);
+					var 亨特前束标准值分 = (前束标准值分上限+前束标准值分下限)/2
+					document.getElementById("前束标准值分").value = 亨特前束标准值分;
+				// 将算出的前束值填入前束标准值分的表格里
+				
+		}
+		
+		// 计算和输出外倾标准值折算为分之后的值
+			var 外倾标准值度 = Number(document.getElementById("外倾标准值度").value);
+			var 外倾标准值分 = Number(document.getElementById("外倾标准值分").value);
+			var 外倾标准值折合分 = -(外倾标准值度*60+外倾标准值分)
+			//document.getElementById("外倾标准值折合分").innerHTML = "外倾标准值折合为分：" + 外倾标准值折合分 + "'";
+		
+		// 计算和输出外倾实际值折算为分之后的值
+			var 外倾实际值度 = Number(document.getElementById("外倾实际值度").value);
+			var 外倾实际值分 = Number(document.getElementById("外倾实际值分").value);
+			var 外倾实际值折合分 = -(外倾实际值度*60+外倾实际值分)
+			//document.getElementById("外倾实际值折合分").innerHTML = "外倾实际值折合为分：" + 外倾实际值折合分 + "'";
+		
+		// 前束取值
+			var 前束标准值分 = Number(document.getElementById("前束标准值分").value);
+			var 前束实际值分 = Number(document.getElementById("前束实际值分").value);
+		// Kc和Kd取值
+			var 斜率 =  document.getElementsByName("选择车型");
+			var Kc = -0.75   // Kc（横向摆臂/上部横摆臂调整螺栓斜率）
+			var Kd = 1.03   //Kd(下臂/外倾控制臂螺栓调整斜率
+			
+			switch(斜率[0].value){   // 根据车型为Kc和Kd赋值
+				case "G12、G38" : 
+					Kc = -0.75;
+					Kd = 1.03
+					break;
+				case "G05、G06、G07" : 
+					Kc = -0.82;
+					Kd = 1.01
+					break;
+				case "F02、F18" : 
+					Kc = -0.659;
+					Kd = 1.316
+					break;
+				case "F11、F07" : 
+					Kc = -0.568;
+					Kd = 1.607
+					break;
+				case "G32" : 
+					Kc = -0.85;
+					Kd = 1.05
+					break;
+				case "G14、G15" : 
+					Kc = -0.83;
+					Kd = 1.06
+					break;	
+				case "G16" : 
+					Kc = -0.82;
+					Kd = 0.96
+					break;					
+				}
+		
+			//document.getElementById("Kc值").innerHTML = "上臂斜率为：" + Kc;
+			//document.getElementById("Kd值").innerHTML = "下臂斜率为：" + Kd;
+		
+			// 中间值1为先调整下臂，中间值2为先调整上臂。
+		
+		// 中间值1外倾计算
+			var 中间值1外倾折合分 = ((Kc*外倾标准值折合分-前束标准值分)-(Kd*外倾实际值折合分-前束实际值分))/(Kc-Kd);
+			中间值1外倾折合分 = Math.round(中间值1外倾折合分);
+			//document.getElementById("中间值1外倾折合分").innerHTML = "中间值1外倾折合分为：</br>" + 中间值1外倾折合分 + "'";
+		
+			var 中间值1外倾度 = Math.ceil(中间值1外倾折合分/60) ; //外倾折合分÷60，得数向上取整。
+			var 中间值1外倾分 = Math.abs(中间值1外倾折合分%60);  //外倾折合分除60取余数再取绝对值。
+			//document.getElementById("中间值1外倾").innerHTML = "中间值1外倾为：</br>" + 中间值1外倾度 + "°" + 中间值1外倾分 + "'";		
+		
+			// 中间值1前束计算
+			var 中间值1前束 = (Kc*Kd*(外倾实际值折合分-外倾标准值折合分)+Kd*前束标准值分-Kc*前束实际值分)/(Kd-Kc);
+		
+			中间值1前束 = Math.round(中间值1前束);
+			//document.getElementById("中间值1前束").innerHTML = "中间值1前束：</br>" + 中间值1前束 + "'";
+
+			// 中间值2外倾计算
+			var 中间值2外倾折合分 = ((Kc*外倾实际值折合分-前束实际值分)-(Kd*外倾标准值折合分-前束标准值分))/(Kc-Kd);
+		
+			中间值2外倾折合分 = Math.round(中间值2外倾折合分); //小数取整
+			//document.getElementById("中间值2外倾折合分").innerHTML = "中间值2外倾折合分为：</br>" + 中间值2外倾折合分 + "'";
+		
+			var 中间值2外倾度 = Math.ceil(中间值2外倾折合分/60) ; //外倾折合分÷60，得数向上取整。
+			var 中间值2外倾分 = Math.abs(中间值2外倾折合分%60);  //外倾折合分除60取余数再取绝对值。
+			//document.getElementById("中间值2外倾").innerHTML = "中间值2外倾为：</br>" + 中间值2外倾度 + "°" + 中间值2外倾分 + "'";		
+
+		// 中间值2前束计算
+			var 中间值2前束 = (Kc*Kd*(外倾标准值折合分-外倾实际值折合分)+Kd*前束实际值分-Kc*前束标准值分)/(Kd-Kc);
+		
+			中间值2前束 = Math.round(中间值2前束);
+			//document.getElementById("中间值2前束").innerHTML = "中间值2前束：</br>" + 中间值2前束 + "'";
+	
+		// 中间值1和中间值2比较
+			var 中间值1距实际值距离 = Math.sqrt(Math.pow((中间值1外倾折合分-外倾实际值折合分),2)+Math.pow((中间值1前束-前束实际值分),2))
+			var 中间值2距实际值距离 = Math.sqrt(Math.pow((中间值2外倾折合分-外倾实际值折合分),2)+Math.pow((中间值2前束-前束实际值分),2))
+			//document.getElementById("中间值1距实际值距离").innerHTML = "中间值1距实际值：</br>" + 中间值1距实际值距离;   
+			//document.getElementById("中间值2距实际值距离").innerHTML = "中间值2距实际值：</br>" + 中间值2距实际值距离;
+		
+			if (中间值1距实际值距离 == 0) {
+				document.getElementById("先调整臂说明").innerHTML = "中间值恰好等于当前值，<strong>直接调整上部横摆臂</strong>即可调整到标准值。" ;
+			} else if (中间值2距实际值距离 == 0) {
+				document.getElementById("先调整臂说明").innerHTML = "中间值恰好等于当前值，<strong>直接调整下臂（外倾控制臂）</strong>即可调整到标准值。" ;				
+			} else if (中间值1距实际值距离 < 中间值2距实际值距离) {
+				document.getElementById("中间值外倾").innerHTML = "中间值外倾为：</br>" + 中间值1外倾度 + "°" + 中间值1外倾分 + "'";
+				document.getElementById("中间值前束").innerHTML = "中间值前束为：</br>" + 中间值1前束 + "'";
+				document.getElementById("先调整臂说明").innerHTML = "①先调整<strong>下臂（外倾控制臂）</strong>调整螺栓，至四轮定位仪显示实际值等于中间值</br>②再调整先调整<strong>上部横摆臂</strong>螺栓螺栓，至四轮定位仪显示实际值等于标准值</br>" ;
+			} else if(中间值1距实际值距离 > 中间值2距实际值距离) {
+				document.getElementById("中间值外倾").innerHTML = "中间值外倾为：</br>" + 中间值2外倾度 + "°" + 中间值2外倾分 + "'";
+				document.getElementById("中间值前束").innerHTML = "中间值前束为：</br>" + 中间值2前束 + "'";
+				document.getElementById("先调整臂说明").innerHTML = "①先调整<strong>上部横摆臂</strong>螺栓螺栓，至四轮定位仪显示实际值等于中间值</br>②再调整<strong>下臂（外倾控制臂）</strong>调整螺栓，至四轮定位仪显示实际值等于标准值 " ;
+			}
+	}
+
+	function 清除数据(){
+		清除输出结果();
+		清除输入数据();
+		//判断设备型号();
+	}
+	function 清除输出结果(){
+		// 清除所有的输出结果
+			document.getElementById("中间值1外倾折合分").innerHTML = ""
+			document.getElementById("中间值1外倾").innerHTML = ""	
+			document.getElementById("中间值1前束").innerHTML = ""		
+			document.getElementById("中间值2外倾折合分").innerHTML = ""		
+			document.getElementById("中间值2前束").innerHTML = ""		
+			document.getElementById("中间值1距实际值距离").innerHTML = ""		
+			document.getElementById("中间值2距实际值距离").innerHTML = ""		
+			document.getElementById("中间值外倾").innerHTML = ""		
+			document.getElementById("中间值前束").innerHTML = ""		
+			document.getElementById("先调整臂说明").innerHTML = ""		
+			document.getElementById("外倾实际值折合分").innerHTML = ""		
+			document.getElementById("Kc值").innerHTML = ""		
+			document.getElementById("Kd值").innerHTML = ""	
+	}
+	function 清除输入数据(){
+		// 清除输入数据
+			document.getElementById("外倾标准值度").value = "";
+			document.getElementById("外倾标准值分").value = "";
+			document.getElementById("前束标准值分").value = "";
+			document.getElementById("外倾实际值度").value = "";
+			document.getElementById("外倾实际值分").value = "";
+			document.getElementById("前束实际值分").value = "";
+			document.getElementById("外倾标准值上限度").value = "";
+			document.getElementById("外倾标准值上限分").value = "";
+			document.getElementById("前束标准值分上限").value = "";
+			document.getElementById("前束标准值分下限").value = "";
+	}	
+	
+	function 判断设备型号() {
+		var 四轮定位仪设备 =  document.getElementsByName("四轮定位仪设备");
+		
+		// alert(四轮定位仪设备[0].value);  // alert是弹框，可以用来查找BUG。 //radio的[0][1]是选项的顺序，用value来获得值，获得的值和选项将没有关系。
+		//alert(四轮定位仪设备[0].checked);
+		//alert(四轮定位仪设备[1].checked);	
+		if (四轮定位仪设备[0].checked == true){  //如果第一个选项被选中
+			//alert("选了亨特");
+			显示亨特相关选项();
+		} else if (四轮定位仪设备[1].checked == true) {
+			//alert("选了百斯巴特");
+			隐藏亨特相关选项();
+		}
+	}	
+
+	function 显示亨特相关选项() {
+	    //显示所有div中classclass="亨特定位仪显示"的项目
+		var 亨特相关显示内容 = document.getElementsByClassName("亨特定位仪显示"); 
+		var i;
+		for (i=0;i<亨特相关显示内容.length;i++){
+			亨特相关显示内容[i].style.display="block";
+		}	
+		//锁定所有input中class="亨特定位仪锁死"的项目为不可编辑状态，同时将相关input的值清空
+		var 亨特定位仪锁死项目 = document.getElementsByClassName("亨特定位仪锁死"); 
+		var i;
+		for (i=0;i<亨特定位仪锁死项目.length;i++){
+			亨特定位仪锁死项目[i].disabled="true";
+			亨特定位仪锁死项目[i].value=""
+		}	
+	}
+	
+	function 隐藏亨特相关选项() {
+	    //隐藏所有div中classclass="亨特定位仪显示"的项目
+		var 亨特相关显示内容 = document.getElementsByClassName("亨特定位仪显示"); 
+		var i;
+		for (i=0;i<亨特相关显示内容.length;i++){
+			亨特相关显示内容[i].style.display="none";
+		}	
+		//解锁所有input中class="亨特定位仪锁死"的项目为可以编辑状态
+		var 亨特定位仪锁死项目 = document.getElementsByClassName("亨特定位仪锁死"); 
+		var i;
+		for (i=0;i<亨特定位仪锁死项目.length;i++){
+			亨特定位仪锁死项目[i].disabled="";
+		}	
+	}	
+	</script>
+
+<!--在body标签结束前引入js-->
+<script src="read.js"></script>
+	
+</body>
+</html>
