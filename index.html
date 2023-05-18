@@ -41,6 +41,7 @@
 	
 	G12：7系；G38：5系；G31：5系旅行车
 	G05：X5；G06：X6；G07：X7
+	G70：全新一代7系
 	F02：老款7系；F18：老款5系
 	F11：5系旅行车；F07：5系GT
 	G32：6系
@@ -51,8 +52,9 @@
 	<div style="border: 2px dashed #ccc;text-align:center;">
 		<H3>选择车型</H3>
 		<select name="选择车型" autofocus>
-			<option value="G12、G38">G12、G38、G31</option>
-			<option value="G05、G06、G07">G05、G06、G07</option>
+			<option value="G38">G38、G38PHEV、G31</option>
+			<option value="G12">G05、G06、G07、G12</option>
+			<option value="G70">G70</option>
 			<option value="F02、F18">F02、F18</option>
 			<option value="F11、F07">F11、F07</option>
 			<option value="G32">G32</option>
@@ -205,14 +207,18 @@
 			var Kd = 1.03   //Kd(下臂/外倾控制臂螺栓调整斜率
 			
 			switch(斜率[0].value){   // 根据车型为Kc和Kd赋值
-				case "G12、G38" : 
+				case "G38" : 
 					Kc = -0.75;
 					Kd = 1.03
 					break;
-				case "G05、G06、G07" : 
+				case "G12" : 
 					Kc = -0.82;
 					Kd = 1.01
 					break;
+				case "G70" : 
+					Kc = -0.8;
+					Kd = 0.97
+					break;	
 				case "F02、F18" : 
 					Kc = -0.659;
 					Kd = 1.316
